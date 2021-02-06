@@ -1,0 +1,130 @@
+## 이터러블 프로그래밍
+<body>
+  <script src="./fx.js"></script>  
+  <script>
+    // 명령형 프로그래밍
+    function f1(limit, list) {
+      let acc = 0;
+      for (const a of list) {
+        if (a % 2) {
+          const b = a * a;
+          acc += b;
+          if (--limit == 0) break;
+        }
+      }
+      console.log(acc);
+    }
+    f1(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  </script>
+
+  <script>
+    const add = (a, b) => a + b;
+    function f2(limit, list) {
+    //   let acc = 0;
+    //   for (const a of L.take(limit, L.map(a => a * a, L.filter(a => a % 2, list)))) {
+    //     acc += a;
+    //   }
+    //   console.log(acc);
+
+      console.log(
+        _.reduce(add,
+          0,
+          L.take(limit, 
+            L.map(a => a * a, 
+              L.filter(a => a % 2, list)))) // 오른쪽에서 왼쪽 위로 올라가면서 작성
+      );
+
+      _.go(list,
+          L.filter(a => a % 2),
+          L.map(a => a * a),
+          L.take(limit),
+          _.reduce(add),
+          console.log)
+    }
+    f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  </script>
+
+// while -> range
+  <script>
+    // function f3(end) {
+    //   let i = 0;
+    //   while (i < end) {
+    //     console.log(i);
+    //     ++i;
+    //   }
+    // }
+    // // f3(10);
+
+    // function f4(end) {
+    //   _.each(console.log, L.range(end));
+    // }
+    // f4(10);
+
+    function f3(end) {
+      let i = 1;
+      while (i < end) {
+        console.log(i);
+        i += 2;
+      }
+    }
+    // f3(10);
+
+    function f4(end) {
+      _.each(console.log, L.range(1, end, 2));
+
+      _.go(
+        L.range(1, end, 2),
+        _.each(console.log)
+      )
+    }
+    f4(10);
+  </script>
+
+  // 별 그리기, 구구단
+  <script>
+    const join = sep => _.reduce((a, b) => `${a}${sep}${b}`);
+
+    // _.go(
+    //   _.range(1, 6),// _.range(5),
+    //   _.map(_.range),
+    //   _.map(_.map(_ => '*')),
+    //   _.map(_.reduce((a, b) => `${a}${b}`)),
+    //   _.reduce((a, b) => `${a}\n${b}`),
+    //   console.log
+    // )
+
+    _.go(
+      L.range(1, 6),// _.range(5),
+      L.map(L.range),
+      L.map(L.map(_ => '*')),
+      L.map(join('')),
+      join('\n'),
+      console.log
+    )
+
+    // map 을 여러번 쓰지 않을때 표현 방법. 시간복잡도나 성능은 똑같음
+    _.go(
+      L.range(1, 6),// _.range(5),
+      L.map(s => _.go(
+        L.range(s),
+        L.map(_ => '*'),
+        _.reduce((a, b) => `${a}${b}`)
+      )),
+      _.reduce((a, b) => `${a}\n${b}`),
+      console.log
+    )
+
+
+    _.go(
+      _.range(2, 10),
+      _.map(a => _.go(
+        _.range(1, 10),
+        _.map(b => `${a}x${b}=${a*b}`),
+        join('\n')
+      )),
+      join('\n\n'),
+      console.log
+    )
+
+  </script>
+</body>
