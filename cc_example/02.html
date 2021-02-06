@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>02. 명령형 습관 지우기 - 만능 reduce ? No!</title>
+</head>
+
+<body>
+  <script src="./fx.js"></script>
+
+  reduce + 복잡한 함수 + acc 보다 map + 간단한 함수 + reduce
+  <script>
+    const users = [
+      { name: 'AA', age: 35 },
+      { name: 'BB', age: 26 },
+      { name: 'CC', age: 28 },
+      { name: 'CC', age: 34 },
+      { name: 'EE', age: 23 },
+    ]
+    console.log(
+      _.reduce((total, u) => total + u.age, 0, users) // 보조함수에서 복잡하게? 이렇게 하는 것보다는 reduce 적용하기 전에 a, b를 동일한 형태로 맞춰주는 것이 좋음. 조합하기 어려움.
+    );
+
+    const add = (a, b) => a + b;
+    const ages = L.map(u => u.age)
+    // console.log(
+    //   _.reduce((a, b) => a + b, L.map(u => u.age, users))
+    // );
+    console.log(
+      _.reduce(add, ages(users))
+    );
+
+  </script>
+
+  // reduce 하나 보다 map + filter + reduce
+  <script>
+    console.log(
+      _.reduce((total, u) => u.age >= 30 ? total : total + u.age
+        , 0
+        , users)
+    );
+
+    console.log(
+      _.reduce((total, u) => total + u.age,
+        0,
+        _.filter(u => u.age < 30, users))
+    );
+
+    console.log(
+      _.reduce(add,
+        L.map(u => u.age,
+          L.filter(u => u.age < 30, users))));
+
+    console.log( // 위랑 동일
+      _.reduce(add,
+        L.filter(n => n < 30,
+          L.map(u => u.age, users))));
+
+  </script>
+
+  // query, queryToObject
+  <script>
+    const obj1 = {
+      a: 1,
+      b: undefined,
+      c: 'CC',
+      d: 'DD'
+    };
+    // a=1&c=CC&d=DD
+
+    function query1(obj) {
+      let res = '';
+      for (const k in obj) {
+        const v = obj[k];
+        if (v === undefined) continue;
+        if (res != '') res += '&';
+        res += k + '=' + v;
+      }
+      return res;
+    }
+    console.log(query1(obj1));
+
+    function query2(obj) {
+      return Object
+        .entries(obj)
+        .reduce((query, [k, v], i) => { // [k, v] 구조분해
+          if (v === undefined) return query;
+          //return query + (i > 0 ? '&' : '') + k + '=' + v;
+          return `${query}${i > 0 ? '&' : ''}${k}=${v}`;
+        }, '');
+    }
+    console.log(query2(obj1));
+
+    // function query3(obj) {
+    //   // return _.filter((kv) => console.log(kv), Object.entries(obj));
+    //   return (
+    //     _.reduce((a, b) => `${a}&${b}`,
+    //       _.map(([k, v]) => `${k}=${v}`,
+    //         _.reject(([_, v]) => v === undefined, // _.filter(([k, v]) => v !== undefined, 안쓰는 거는 _로 하는 convention 이 있다.
+    //       Object.entries(obj)))))
+    // }
+
+    // const query3 = obj => 
+    //   _.reduce((a, b) => `${a}&${b}`,
+    //     _.map(([k, v]) => `${k}=${v}`,
+    //       _.reject(([_, v]) => v === undefined, // _.filter(([k, v]) => v !== undefined, 안쓰는 거는 _로 하는 convention 이 있다.
+    //     Object.entries(obj))));
+
+    const join = _.curry((sep, iter) =>
+      _.reduce((a, b) => `${a}${sep}${b}`, iter));
+
+    const query3 = obj =>
+      join('&',
+        _.map(([k, v]) => `${k}=${v}`,
+          _.reject(([_, v]) => v === undefined, // _.filter(([k, v]) => v !== undefined, 안쓰는 거는 _로 하는 convention 이 있다.
+            Object.entries(obj))));
+
+    // const query4 = obj => _.go(
+    //   obj,
+    //   Object.entries,
+    //   _.reject(([_, v]) => v === undefined),
+    //   _.map(join('=')),
+    //   join('&')
+    // );
+
+    const query4 = _.pipe(
+      Object.entries,
+      L.reject(([_, v]) => v === undefined),
+      L.map(join('=')),
+      join('&')
+    );
+
+    console.log(query4(obj1));
+  </script>
+
+  // queryToObject
+  <script>
+    const split = _.curry((sep, str) => str.split(sep));
+
+    const queryToObject = _.pipe(
+      split('&'),
+      L.map(split('=')),
+      L.map(([k, v]) => ({ [k]: v })),
+      _.reduce(Object.assign)
+    )
+    console.log(queryToObject('a=1&c=CC&d=DD'));
+
+  </script>
+</body>
+
+</html>

@@ -1,6 +1,14 @@
-## 이터러블 프로그래밍
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>01. ## 이터러블 프로그래밍</title>
+</head>
+
 <body>
-  <script src="./fx.js"></script>  
+  <script src="./fx.js"></script>
   <script>
     // 명령형 프로그래밍
     function f1(limit, list) {
@@ -20,31 +28,31 @@
   <script>
     const add = (a, b) => a + b;
     function f2(limit, list) {
-    //   let acc = 0;
-    //   for (const a of L.take(limit, L.map(a => a * a, L.filter(a => a % 2, list)))) {
-    //     acc += a;
-    //   }
-    //   console.log(acc);
+      //   let acc = 0;
+      //   for (const a of L.take(limit, L.map(a => a * a, L.filter(a => a % 2, list)))) {
+      //     acc += a;
+      //   }
+      //   console.log(acc);
 
       console.log(
         _.reduce(add,
           0,
-          L.take(limit, 
-            L.map(a => a * a, 
+          L.take(limit,
+            L.map(a => a * a,
               L.filter(a => a % 2, list)))) // 오른쪽에서 왼쪽 위로 올라가면서 작성
       );
 
       _.go(list,
-          L.filter(a => a % 2),
-          L.map(a => a * a),
-          L.take(limit),
-          _.reduce(add),
-          console.log)
+        L.filter(a => a % 2),
+        L.map(a => a * a),
+        L.take(limit),
+        _.reduce(add),
+        console.log)
     }
     f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   </script>
 
-// while -> range
+  // while -> range
   <script>
     // function f3(end) {
     //   let i = 0;
@@ -119,7 +127,7 @@
       _.range(2, 10),
       _.map(a => _.go(
         _.range(1, 10),
-        _.map(b => `${a}x${b}=${a*b}`),
+        _.map(b => `${a}x${b}=${a * b}`),
         join('\n')
       )),
       join('\n\n'),
@@ -128,3 +136,5 @@
 
   </script>
 </body>
+
+</html>
