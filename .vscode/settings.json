@@ -8,5 +8,7 @@
 	},
 
 	"prettier.semi": true,
-	"prettier.arrowParens": "always"
+	"prettier.printWidth": 300,
+	"prettier.arrowParens": "always",
+	"prettier.tabWidth": 4
 }
